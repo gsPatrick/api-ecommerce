@@ -54,7 +54,7 @@ class PaymentService {
         }
 
         // Use order amount if not provided
-        const paymentAmount = amount || order.total_amount;
+        const paymentAmount = amount || order.total;
 
         if (!paymentAmount || paymentAmount <= 0) {
             throw new Error('Invalid payment amount');
