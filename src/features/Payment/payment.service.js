@@ -7,9 +7,13 @@ class PaymentService {
     async getProvider(name) {
         // Fetch config dynamically
         const config = await StoreConfig.findOne({ where: { group: 'payment', key: name } });
-        const credentials = config ? config.value : {};
+        let credentials = config ? config.value : {};
 
         if (name === 'mercadopago') {
+            // Fallback to ENV if not in DB
+            if (!credentials.accessToken && process.env.MERCADOPAGO_ACCESS_TOKEN) {
+                credentials.accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+            }
             return new MercadoPagoProvider(credentials);
         } else if (name === 'asaas') {
             return new AsaasProvider(credentials);
