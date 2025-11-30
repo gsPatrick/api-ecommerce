@@ -1,4 +1,4 @@
-const { Payment, Order, StoreConfig } = require('../../models');
+const { Payment, Order, StoreConfig, User } = require('../../models');
 const MercadoPagoProvider = require('./providers/mercadopago.provider');
 const AsaasProvider = require('./providers/asaas.provider');
 const StripeProvider = require('./providers/stripe.provider');
@@ -46,7 +46,7 @@ class PaymentService {
         }
 
         const order = await Order.findByPk(orderId, {
-            include: ['user'] // Include user to get email
+            include: [User] // Include user to get email
         });
 
         if (!order) {
