@@ -134,7 +134,11 @@ class OrderService {
     async getOrders(userId) {
         return await Order.findAll({
             where: { userId },
-            include: [{ model: OrderItem, as: 'items' }]
+            include: [
+                { model: OrderItem, as: 'items' },
+                { model: Payment }
+            ],
+            order: [['createdAt', 'DESC']]
         });
     }
 
