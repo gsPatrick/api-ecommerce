@@ -55,7 +55,80 @@ Product.belongsToMany(Product, {
 User.hasMany(TrackingEvent, { foreignKey: 'userId' });
 TrackingEvent.belongsTo(User, { foreignKey: 'userId' });
 
-// ... (Associations)
+// User & Address
+User.hasMany(Address, { foreignKey: 'userId' });
+Address.belongsTo(User, { foreignKey: 'userId' });
+
+// User & Cart
+User.hasOne(Cart, { foreignKey: 'userId' });
+Cart.belongsTo(User, { foreignKey: 'userId' });
+
+// User & Order
+User.hasMany(Order, { foreignKey: 'userId' });
+Order.belongsTo(User, { foreignKey: 'userId' });
+
+// User & Review
+User.hasMany(Review, { foreignKey: 'userId' });
+Review.belongsTo(User, { foreignKey: 'userId' });
+
+// User & Wishlist
+User.hasMany(Wishlist, { foreignKey: 'userId' });
+Wishlist.belongsTo(User, { foreignKey: 'userId' });
+
+// Product & Attributes
+Product.hasMany(ProductAttribute, { foreignKey: 'productId', as: 'attributes' });
+ProductAttribute.belongsTo(Product, { foreignKey: 'productId' });
+
+// Product & Variations
+Product.hasMany(ProductVariation, { foreignKey: 'productId', as: 'variations' });
+ProductVariation.belongsTo(Product, { foreignKey: 'productId' });
+
+// Product & Review
+Product.hasMany(Review, { foreignKey: 'productId' });
+Review.belongsTo(Product, { foreignKey: 'productId' });
+
+// Product & Wishlist
+Product.hasMany(Wishlist, { foreignKey: 'productId' });
+Wishlist.belongsTo(Product, { foreignKey: 'productId' });
+
+// Product & StockMovement
+Product.hasMany(StockMovement, { foreignKey: 'productId' });
+StockMovement.belongsTo(Product, { foreignKey: 'productId' });
+
+// Variation & StockMovement
+ProductVariation.hasMany(StockMovement, { foreignKey: 'variationId' });
+StockMovement.belongsTo(ProductVariation, { foreignKey: 'variationId' });
+
+// Cart & CartItem
+Cart.hasMany(CartItem, { foreignKey: 'cartId', as: 'items' });
+CartItem.belongsTo(Cart, { foreignKey: 'cartId' });
+
+// CartItem & Product/Variation
+CartItem.belongsTo(Product, { foreignKey: 'productId' });
+CartItem.belongsTo(ProductVariation, { foreignKey: 'variationId' });
+
+// Order & OrderItem
+Order.hasMany(OrderItem, { foreignKey: 'orderId', as: 'items' });
+OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
+
+// OrderItem & Product/Variation
+OrderItem.belongsTo(Product, { foreignKey: 'productId' });
+OrderItem.belongsTo(ProductVariation, { foreignKey: 'variationId' });
+
+// Order & Coupon
+Order.belongsTo(Coupon, { foreignKey: 'couponId' });
+
+// Order & Payment
+Order.hasMany(Payment, { foreignKey: 'orderId' });
+Payment.belongsTo(Order, { foreignKey: 'orderId' });
+
+// Order & StockMovement
+Order.hasMany(StockMovement, { foreignKey: 'orderId' });
+StockMovement.belongsTo(Order, { foreignKey: 'orderId' });
+
+// User & File (Uploads)
+User.hasMany(File, { foreignKey: 'userId' });
+File.belongsTo(User, { foreignKey: 'userId' });
 
 // Category Associations
 Category.hasMany(Product, { foreignKey: 'categoryId' });
