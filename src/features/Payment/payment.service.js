@@ -121,8 +121,10 @@ class PaymentService {
         });
 
         // Update order status
+        const isApproved = result.status === 'approved';
         await order.update({
-            status: result.status === 'approved' ? 'paid' : 'pending_payment'
+            payment_status: isApproved ? 'paid' : 'pending',
+            status: isApproved ? 'processing' : 'pending'
         });
 
         return { payment, result };
