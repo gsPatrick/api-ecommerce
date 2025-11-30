@@ -2,7 +2,9 @@ const { Order, OrderItem, Cart, CartItem, Product, ProductVariation, sequelize }
 const inventoryService = require('../Inventory/inventory.service');
 
 class OrderService {
-    async createOrder(userId, shippingAddress) {
+    async createOrder(data) {
+        const { userId, shippingAddress, paymentMethod, shippingCost = 0, discount = 0, notes, couponCode } = data;
+
         const transaction = await sequelize.transaction();
         try {
             const cart = await Cart.findOne({
@@ -14,7 +16,7 @@ class OrderService {
                 throw new Error('Cart is empty');
             }
 
-            let total = 0;
+            let subtotal = 0;
             const orderItemsData = [];
 
             for (const item of cart.items) {
@@ -25,7 +27,7 @@ class OrderService {
                     throw new Error(`Insufficient stock for ${item.Product.name}`);
                 }
 
-                total += parseFloat(price) * item.quantity;
+                subtotal += parseFloat(price) * item.quantity;
 
                 // Snapshot data
                 orderItemsData.push({
@@ -46,16 +48,25 @@ class OrderService {
                     type: 'out',
                     reason: 'Order Placement',
                     userId,
-                    orderId: null // We don't have order ID yet, will update later or ignore for now
+                    orderId: null // Will update if needed
                 }, transaction);
             }
+
+            // Calculate Final Total
+            const total = subtotal + parseFloat(shippingCost) - parseFloat(discount);
 
             // Create Order
             const order = await Order.create({
                 userId,
+                subtotal,
                 total,
                 shipping_address: shippingAddress,
-                status: 'pending'
+                shipping_cost: shippingCost,
+                discount_total: discount,
+                payment_method: paymentMethod,
+                notes: notes,
+                status: 'pending',
+                payment_status: 'pending'
             }, { transaction });
 
             // Create OrderItems

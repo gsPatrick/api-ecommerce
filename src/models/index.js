@@ -55,6 +55,16 @@ Product.belongsToMany(Product, {
 User.hasMany(TrackingEvent, { foreignKey: 'userId' });
 TrackingEvent.belongsTo(User, { foreignKey: 'userId' });
 
+// ... (Associations)
+
+// Category Associations
+Category.hasMany(Product, { foreignKey: 'categoryId' });
+Product.belongsTo(Category, { foreignKey: 'categoryId' });
+
+// Subcategories
+Category.hasMany(Category, { as: 'subcategories', foreignKey: 'parentId' });
+Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' });
+
 module.exports = {
     sequelize,
     User,
@@ -78,130 +88,5 @@ module.exports = {
     Question,
     RelatedProduct,
     TrackingEvent,
+    Category
 };
-
-// User & Address
-User.hasMany(Address, { foreignKey: 'userId' });
-Address.belongsTo(User, { foreignKey: 'userId' });
-
-// ... (Existing associations)
-
-// Product & StockMovement
-Product.hasMany(StockMovement, { foreignKey: 'productId' });
-StockMovement.belongsTo(Product, { foreignKey: 'productId' });
-
-// Variation & StockMovement
-ProductVariation.hasMany(StockMovement, { foreignKey: 'variationId' });
-StockMovement.belongsTo(ProductVariation, { foreignKey: 'variationId' });
-
-// Order & StockMovement
-Order.hasMany(StockMovement, { foreignKey: 'orderId' });
-StockMovement.belongsTo(Order, { foreignKey: 'orderId' });
-
-module.exports = {
-    sequelize,
-    User,
-    Product,
-    ProductAttribute,
-    ProductVariation,
-    Coupon,
-    Cart,
-    CartItem,
-    Order,
-    OrderItem,
-    Address,
-    StoreConfig,
-    Review,
-    Wishlist,
-    Payment,
-    File,
-    StockMovement,
-};
-
-// User & Cart
-User.hasOne(Cart, { foreignKey: 'userId' });
-Cart.belongsTo(User, { foreignKey: 'userId' });
-
-// User & Order
-User.hasMany(Order, { foreignKey: 'userId' });
-Order.belongsTo(User, { foreignKey: 'userId' });
-
-// User & Review
-User.hasMany(Review, { foreignKey: 'userId' });
-Review.belongsTo(User, { foreignKey: 'userId' });
-
-// User & Wishlist
-User.hasMany(Wishlist, { foreignKey: 'userId' });
-Wishlist.belongsTo(User, { foreignKey: 'userId' });
-
-// Product & Attributes
-Product.hasMany(ProductAttribute, { foreignKey: 'productId', as: 'attributes' });
-ProductAttribute.belongsTo(Product, { foreignKey: 'productId' });
-
-// Product & Variations
-Product.hasMany(ProductVariation, { foreignKey: 'productId', as: 'variations' });
-ProductVariation.belongsTo(Product, { foreignKey: 'productId' });
-
-// Product & Review
-Product.hasMany(Review, { foreignKey: 'productId' });
-Review.belongsTo(Product, { foreignKey: 'productId' });
-
-// Product & Wishlist
-Product.hasMany(Wishlist, { foreignKey: 'productId' });
-Wishlist.belongsTo(Product, { foreignKey: 'productId' });
-
-// Cart & CartItem
-Cart.hasMany(CartItem, { foreignKey: 'cartId', as: 'items' });
-CartItem.belongsTo(Cart, { foreignKey: 'cartId' });
-
-// CartItem & Product/Variation
-CartItem.belongsTo(Product, { foreignKey: 'productId' });
-CartItem.belongsTo(ProductVariation, { foreignKey: 'variationId' });
-
-// Order & OrderItem
-Order.hasMany(OrderItem, { foreignKey: 'orderId', as: 'items' });
-OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
-
-// OrderItem & Product/Variation
-OrderItem.belongsTo(Product, { foreignKey: 'productId' });
-OrderItem.belongsTo(ProductVariation, { foreignKey: 'variationId' });
-
-// Order & Coupon (Optional tracking)
-Order.belongsTo(Coupon, { foreignKey: 'couponId' });
-
-// Order & Payment
-Order.hasMany(Payment, { foreignKey: 'orderId' });
-Payment.belongsTo(Order, { foreignKey: 'orderId' });
-
-// User & File (Uploads)
-User.hasMany(File, { foreignKey: 'userId' });
-File.belongsTo(User, { foreignKey: 'userId' });
-
-module.exports = {
-    sequelize,
-    User,
-    Product,
-    ProductAttribute,
-    ProductVariation,
-    Coupon,
-    Cart,
-    CartItem,
-    Order,
-    OrderItem,
-    Address,
-    StoreConfig,
-    Review,
-    Wishlist,
-    Payment,
-    Payment,
-    File,
-    Category,
-};
-
-// Category Associations
-Category.hasMany(Product, { foreignKey: 'categoryId' });
-Product.belongsTo(Category, { foreignKey: 'categoryId' });
-
-// Subcategories
-Category.hasMany(Category, { as: 'subcategories', foreignKey: 'parentId' });
-Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' });

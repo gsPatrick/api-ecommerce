@@ -3,8 +3,18 @@ const orderService = require('./order.service');
 class OrderController {
     async create(req, res) {
         try {
-            const { shippingAddress } = req.body;
-            const order = await orderService.createOrder(req.user.id, shippingAddress);
+            const { shippingAddress, paymentMethod, shippingCost, discount, notes, couponCode } = req.body;
+
+            const order = await orderService.createOrder({
+                userId: req.user.id,
+                shippingAddress,
+                paymentMethod,
+                shippingCost,
+                discount,
+                notes,
+                couponCode
+            });
+
             res.status(201).json(order);
         } catch (error) {
             res.status(400).json({ error: error.message });
