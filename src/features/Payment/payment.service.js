@@ -10,13 +10,18 @@ class PaymentService {
             where: { group: 'payment', key: name }
         });
 
-        if (!config || !config.value) {
-            throw new Error(`Payment provider ${name} not configured`);
-        }
-
-        const credentials = config.value;
+        let credentials = config ? config.value : {};
 
         if (name === 'mercadopago') {
+            // Fallback to ENV if not in DB
+            if (!credentials.accessToken && process.env.MERCADOPAGO_ACCESS_TOKEN) {
+                credentials.accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+            }
+
+            if (!credentials.accessToken) {
+                throw new Error(`MercadoPago not configured (missing accessToken)`);
+            }
+
             return new MercadoPagoProvider(credentials);
         } else if (name === 'asaas') {
             return new AsaasProvider(credentials);
