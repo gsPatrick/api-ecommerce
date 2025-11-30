@@ -25,7 +25,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// Database connection and server start
+// Porta obrigatória nos buildpacks/docker
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
@@ -33,16 +33,17 @@ async function startServer() {
         await sequelize.authenticate();
         console.log('Database connected.');
 
-        // Sync models (use { force: true } to recreate tables, { alter: true } to update)
-        // For development, we'll use alter: true to ensure schema matches models
+        // ⚠️ FORCE TRUE ATIVADO A PEDIDO
         await sequelize.sync({ force: true });
-        console.log('Models synced.');
+        console.log('Models synced with FORCE: TRUE (Tables DROPPED & recreated).');
 
         app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
+            console.log(`Server running on port ${PORT}`);
         });
+
     } catch (error) {
         console.error('Unable to connect to the database:', error);
+        process.exit(1);
     }
 }
 
