@@ -15,7 +15,14 @@ const Product = sequelize.define('Product', {
         type: DataTypes.TEXT,
     },
     category: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING, // Legacy/Fallback
+    },
+    categoryId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: 'Categories',
+            key: 'id',
+        },
     },
     // Base fields for simple products or display
     price: {

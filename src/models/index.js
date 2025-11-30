@@ -1,6 +1,7 @@
 const sequelize = require('../config/sequelize');
 const User = require('./user');
 const Product = require('./product');
+const Category = require('./category');
 const ProductAttribute = require('./productAttribute');
 const ProductVariation = require('./productVariation');
 const Coupon = require('./coupon');
@@ -192,5 +193,15 @@ module.exports = {
     Review,
     Wishlist,
     Payment,
+    Payment,
     File,
+    Category,
 };
+
+// Category Associations
+Category.hasMany(Product, { foreignKey: 'categoryId' });
+Product.belongsTo(Category, { foreignKey: 'categoryId' });
+
+// Subcategories
+Category.hasMany(Category, { as: 'subcategories', foreignKey: 'parentId' });
+Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' });
