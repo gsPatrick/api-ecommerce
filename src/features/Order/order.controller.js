@@ -1,4 +1,3 @@
-```javascript
 const orderService = require('./order.service');
 
 class OrderController {
