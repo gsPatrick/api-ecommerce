@@ -1,9 +1,10 @@
+```javascript
 const orderService = require('./order.service');
 
 class OrderController {
     async create(req, res) {
         try {
-            const { shippingAddress, paymentMethod, shippingCost, discount, notes, couponCode } = req.body;
+            const { shippingAddress, paymentMethod, shippingCost, discount, notes, couponCode, items } = req.body;
 
             const order = await orderService.createOrder({
                 userId: req.user.id,
@@ -12,7 +13,8 @@ class OrderController {
                 shippingCost,
                 discount,
                 notes,
-                couponCode
+                couponCode,
+                items
             });
 
             res.status(201).json(order);
