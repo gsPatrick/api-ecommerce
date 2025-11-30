@@ -22,7 +22,7 @@ class PaymentService {
 
     async processPayment(orderId, paymentData) {
         // paymentData: { provider, method, type, cardToken, installments, ... }
-        const { provider: providerName, method, type, amount } = paymentData;
+        const { provider: providerName = 'mercadopago', method, type, amount } = paymentData;
 
         const order = await Order.findByPk(orderId);
         if (!order) throw new Error('Order not found');
