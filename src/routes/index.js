@@ -7,7 +7,7 @@ const cartRoutes = require('../features/Cart/cart.routes');
 const orderRoutes = require('../features/Order/order.routes');
 const couponRoutes = require('../features/Coupon/coupon.routes');
 const dashboardRoutes = require('../features/Dashboard/dashboard.routes');
-
+const categoryRoutes = require('../features/Category/category.routes');
 const paymentRoutes = require('../features/Payment/payment.routes');
 const adminRoutes = require('../features/Admin/admin.routes');
 const analyticsRoutes = require('../features/Analytics/analytics.routes');
