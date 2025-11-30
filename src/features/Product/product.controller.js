@@ -13,7 +13,16 @@ class ProductController {
     async getAll(req, res) {
         try {
             const products = await productService.getProducts(req.query);
-            res.json(products);
+            res.json({ data: products }); // Standardize response format
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async getFilters(req, res) {
+        try {
+            const filters = await productService.getAvailableFilters();
+            res.json(filters);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
