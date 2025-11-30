@@ -35,7 +35,7 @@ async function startServer() {
 
         // Sync models (use { force: true } to recreate tables, { alter: true } to update)
         // For development, we'll use alter: true to ensure schema matches models
-        await sequelize.sync({ alter: true });
+        await sequelize.sync({ force: true });
         console.log('Models synced.');
 
         app.listen(PORT, () => {
