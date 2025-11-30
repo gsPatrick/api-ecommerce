@@ -1,7 +1,7 @@
-const storeConfigService = require('../StoreConfig/storeConfig.service');
-const reviewService = require('../Review/review.service');
-const wishlistService = require('../Wishlist/wishlist.service');
-const { uploadService } = require('../Upload/upload.service');
+const storeConfigService = require('../features/StoreConfig/storeConfig.service');
+const reviewService = require('../features/Review/review.service');
+const wishlistService = require('../features/Wishlist/wishlist.service');
+const { uploadService } = require('../features/Upload/upload.service');
 
 const StoreConfigController = {
     async getPublic(req, res) {
