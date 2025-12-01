@@ -1,4 +1,4 @@
-const { User, Cart, Order } = require('../../models');
+const { User, Cart, Order, Role } = require('../../models');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -21,7 +21,10 @@ class UserService {
     }
 
     async login(email, password) {
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({
+            where: { email },
+            include: [{ model: Role }]
+        });
         if (!user) {
             throw new Error('Invalid credentials');
         }
@@ -39,7 +42,10 @@ class UserService {
     }
 
     async getProfile(userId) {
-        return await User.findByPk(userId, { attributes: { exclude: ['password'] } });
+        return await User.findByPk(userId, {
+            attributes: { exclude: ['password'] },
+            include: [{ model: Role }]
+        });
     }
 
     async getAllUsers() {

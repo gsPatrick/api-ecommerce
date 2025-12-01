@@ -28,6 +28,7 @@ router.use('/admin', adminRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/shipping', require('../features/Shipping/shipping.routes'));
 router.use('/integration', require('../features/Integration/integration.routes'));
+router.use('/roles', require('../features/Role/role.routes'));
 
 // Config Routes
 router.get('/config', StoreConfigController.getPublic);
