@@ -33,14 +33,45 @@ const { Category, Product, ProductAttribute, ProductVariation, User } = require(
 async function seedData() {
     console.log('🌱 Seeding data...');
 
-    // 0. Admin User
+    // 0. Roles & Permissions
+    const { Role } = require('./src/models');
+
+    const allResources = ['dashboard', 'products', 'orders', 'customers', 'coupons', 'shipping', 'settings', 'roles'];
+    const allActions = ['read', 'create', 'update', 'delete'];
+    const superAdminPermissions = [];
+
+    allResources.forEach(res => {
+        allActions.forEach(act => {
+            superAdminPermissions.push(`${res}:${act}`);
+        });
+    });
+
+    const superAdminRole = await Role.create({
+        name: 'Super Admin',
+        description: 'Acesso total ao sistema',
+        permissions: superAdminPermissions
+    });
+
+    console.log('🛡️ Super Admin Role created');
+
+    // 0. Admin Users
     await User.create({
         name: 'Patrick Admin',
         email: 'patrick@gmail.com',
         password: 'patrick123',
-        role: 'admin'
+        role: 'admin',
+        roleId: superAdminRole.id
     });
-    console.log('👤 Admin user created: patrick@gmail.com / patrick123');
+
+    await User.create({
+        name: 'Admin Principal',
+        email: 'Nos.ecolaborativo@gmail.com',
+        password: 'Lorena13@',
+        role: 'admin',
+        roleId: superAdminRole.id
+    });
+
+    console.log('👤 Admin users created with Super Admin role');
 
     // 1. Categories
     const catRoupas = await Category.create({ name: 'Roupas', slug: 'roupas', description: 'O melhor do streetwear.', isActive: true });
