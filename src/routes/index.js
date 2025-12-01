@@ -24,11 +24,15 @@ router.use('/coupons', couponRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/admin', adminRoutes);
+router.use('/admin', adminRoutes);
 router.use('/analytics', analyticsRoutes);
+router.use('/shipping', require('../features/Shipping/shipping.routes'));
+router.use('/integration', require('../features/Integration/integration.routes'));
 
 // Config Routes
 router.get('/config', StoreConfigController.getPublic);
 router.post('/config', authMiddleware, adminMiddleware, StoreConfigController.update);
+router.post('/config/bulk', authMiddleware, adminMiddleware, StoreConfigController.updateBulk);
 
 // Review Routes
 router.post('/reviews', authMiddleware, ReviewController.add);

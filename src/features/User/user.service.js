@@ -41,6 +41,28 @@ class UserService {
     async getProfile(userId) {
         return await User.findByPk(userId, { attributes: { exclude: ['password'] } });
     }
+
+    async getAllUsers() {
+        const users = await User.findAll({
+            include: [{ model: Order, as: 'orders' }],
+            attributes: { exclude: ['password'] },
+            order: [['createdAt', 'DESC']]
+        });
+
+        return users.map(user => {
+            const orders = user.orders || [];
+            const ltv = orders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+            // Sort orders to find last one
+            const sortedOrders = orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            return {
+                ...user.toJSON(),
+                ordersCount: orders.length,
+                ltv,
+                lastOrderDate: sortedOrders.length > 0 ? sortedOrders[0].createdAt : null
+            };
+        });
+    }
 }
 
 module.exports = new UserService();

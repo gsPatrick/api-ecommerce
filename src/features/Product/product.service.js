@@ -26,6 +26,19 @@ class ProductService {
             }
         }
 
+        // Integration with Brechó
+        if (process.env.INTEGRATION_ENABLED === 'true') {
+            const brechoProvider = require('../Integration/brecho.provider');
+            const brechoProduct = await brechoProvider.createProductInBrecho(productData);
+
+            if (brechoProduct) {
+                await product.update({
+                    brechoId: brechoProduct.id,
+                    sku: brechoProduct.codigo_etiqueta // Ensure local SKU matches Brechó tag
+                });
+            }
+        }
+
         return this.getProductById(product.id);
     }
 

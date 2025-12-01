@@ -22,6 +22,7 @@ const ProductBatch = require('./productBatch');
 const Question = require('./question');
 const RelatedProduct = require('./relatedProduct');
 const TrackingEvent = require('./trackingEvent');
+const ShippingRule = require('./shippingRule');
 
 // User & Role
 User.belongsTo(Role, { foreignKey: 'roleId' });
@@ -161,5 +162,6 @@ module.exports = {
     Question,
     RelatedProduct,
     TrackingEvent,
-    Category
+    Category,
+    ShippingRule
 };

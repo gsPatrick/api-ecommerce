@@ -124,6 +124,11 @@ const Product = sequelize.define('Product', {
     allow_negative_stock: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+    },
+    brechoId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        unique: true
     }
 });
 

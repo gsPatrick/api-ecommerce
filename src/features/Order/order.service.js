@@ -124,6 +124,25 @@ class OrderService {
             }
 
             await transaction.commit();
+
+            // Notify Brechó about the order
+            if (process.env.INTEGRATION_ENABLED === 'true') {
+                try {
+                    const brechoProvider = require('../Integration/brecho.provider');
+                    // Fetch full order with items and user for notification
+                    const fullOrder = await Order.findByPk(order.id, {
+                        include: ['User', { model: OrderItem, as: 'items' }]
+                    });
+
+                    // Run in background (don't await)
+                    brechoProvider.notifyOrder(fullOrder).catch(err =>
+                        console.error('Background Brechó notification failed:', err.message)
+                    );
+                } catch (integrationError) {
+                    console.error('Failed to initiate Brechó notification:', integrationError.message);
+                }
+            }
+
             return order;
         } catch (error) {
             await transaction.rollback();

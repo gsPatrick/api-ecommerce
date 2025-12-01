@@ -28,10 +28,19 @@ app.use((err, req, res, next) => {
 // Porta obrigatória nos buildpacks/docker
 const PORT = process.env.PORT || 3000;
 
-const { Category, Product, ProductAttribute, ProductVariation } = require('./src/models');
+const { Category, Product, ProductAttribute, ProductVariation, User } = require('./src/models');
 
 async function seedData() {
     console.log('🌱 Seeding data...');
+
+    // 0. Admin User
+    await User.create({
+        name: 'Patrick Admin',
+        email: 'patrick@gmail.com',
+        password: 'patrick123',
+        role: 'admin'
+    });
+    console.log('👤 Admin user created: patrick@gmail.com / patrick123');
 
     // 1. Categories
     const catRoupas = await Category.create({ name: 'Roupas', slug: 'roupas', description: 'O melhor do streetwear.', isActive: true });

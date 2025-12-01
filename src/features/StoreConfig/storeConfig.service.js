@@ -29,6 +29,15 @@ class StoreConfigService {
 
         return config;
     }
+
+    async bulkUpdate(configs) {
+        const results = [];
+        for (const cfg of configs) {
+            const result = await this.setConfig(cfg.key, cfg.value, cfg.group, cfg.is_public);
+            results.push(result);
+        }
+        return results;
+    }
 }
 
 module.exports = new StoreConfigService();

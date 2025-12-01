@@ -12,6 +12,11 @@ const StoreConfigController = {
         const { key, value, group, is_public } = req.body;
         const config = await storeConfigService.setConfig(key, value, group, is_public);
         res.json(config);
+    },
+    async updateBulk(req, res) {
+        const configs = req.body; // Expects array of { key, value, group, is_public }
+        const results = await storeConfigService.bulkUpdate(configs);
+        res.json(results);
     }
 };
 
