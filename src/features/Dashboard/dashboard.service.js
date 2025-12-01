@@ -1,4 +1,4 @@
-const { Order, OrderItem, Product, sequelize } = require('../../models');
+const { Order, OrderItem, Product, sequelize, Op } = require('../../models');
 
 class DashboardService {
     async getStats() {
@@ -25,7 +25,7 @@ class DashboardService {
         // Advanced Stats
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const dailyRevenue = await Order.sum('total', { where: { createdAt: { [sequelize.Op.gte]: today } } });
+        const dailyRevenue = await Order.sum('total', { where: { createdAt: { [Op.gte]: today } } });
 
         // Abandoned Carts (Updated > 24h ago, no order linked - simplified logic: just count carts not empty)
         // In real app, check if cart has items and updated < 24h ago
@@ -37,7 +37,7 @@ class DashboardService {
 
         // Low Stock
         const lowStockProducts = await Product.findAll({
-            where: { stock: { [sequelize.Op.lt]: 10 } }, // Threshold 10
+            where: { stock: { [Op.lt]: 10 } }, // Threshold 10
             limit: 10
         });
 

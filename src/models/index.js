@@ -1,3 +1,4 @@
+const { Sequelize, Op } = require('sequelize');
 const sequelize = require('../config/sequelize');
 const User = require('./user');
 const Product = require('./product');
@@ -163,5 +164,7 @@ module.exports = {
     RelatedProduct,
     TrackingEvent,
     Category,
-    ShippingRule
+    ShippingRule,
+    Sequelize,
+    Op
 };
