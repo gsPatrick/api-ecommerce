@@ -45,7 +45,7 @@ class AnalyticsService {
     async getProductPerformance() {
         // Revenue & Quantity by Product
         const performance = await sequelize.query(`
-      SELECT p.name, p.id, 
+      SELECT p.name, p.id, p.stock,
              SUM(oi.quantity) as total_sold, 
              SUM(oi.price * oi.quantity) as revenue,
              (SELECT COUNT(*) FROM "TrackingEvents" te WHERE te."eventType" = 'view_item' AND te.data->>'productId' = CAST(p.id AS TEXT)) as views
