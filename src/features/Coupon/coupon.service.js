@@ -3,7 +3,19 @@ const { Op } = require('sequelize');
 
 class CouponService {
     async createCoupon(data) {
+        if (data.is_main) {
+            await Coupon.update({ is_main: false }, { where: { is_main: true } });
+        }
         return await Coupon.create(data);
+    }
+
+    async updateCoupon(id, data) {
+        if (data.is_main) {
+            await Coupon.update({ is_main: false }, { where: { is_main: true, id: { [Op.ne]: id } } });
+        }
+        const coupon = await Coupon.findByPk(id);
+        if (!coupon) throw new Error('Coupon not found');
+        return await coupon.update(data);
     }
 
     async validateCoupon(code, cartTotal, cartItems) {

@@ -55,6 +55,10 @@ const Coupon = sequelize.define('Coupon', {
     subscriber_only: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+    },
+    is_main: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
     }
 });
 
