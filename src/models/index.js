@@ -66,7 +66,7 @@ User.hasOne(Cart, { foreignKey: 'userId' });
 Cart.belongsTo(User, { foreignKey: 'userId' });
 
 // User & Order
-User.hasMany(Order, { foreignKey: 'userId' });
+User.hasMany(Order, { foreignKey: 'userId', as: 'orders' });
 Order.belongsTo(User, { foreignKey: 'userId' });
 
 // User & Review
