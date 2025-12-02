@@ -2,63 +2,111 @@ const { Product, ProductAttribute, ProductVariation, Category, Brand } = require
 
 class ProductService {
     async createProduct(data) {
-        // data: { name, description, price, sku, stock, is_variable, attributes: [{name, options}], variations: [...] }
+        const { sequelize } = require('../../models'); // Import sequelize instance
         const { attributes, variations, ...productData } = data;
+        const { Op } = require('sequelize');
 
-        // Handle Brand
-        if (data.brand) {
-            const [brand] = await Brand.findOrCreate({
-                where: { name: data.brand },
-                defaults: { slug: data.brand.toLowerCase().replace(/ /g, '-'), active: true }
-            });
-            data.brandId = brand.id;
-        }
-
-        // Check if product with same SKU already exists
+        // 1. Idempotency Checks (SKU and BrechoID)
         if (productData.sku) {
             const existingProduct = await Product.findOne({ where: { sku: productData.sku } });
-            if (existingProduct) {
-                // Return existing product (Idempotency)
-                return this.getProductById(existingProduct.id);
-            }
+            if (existingProduct) return this.getProductById(existingProduct.id);
+        }
+        if (productData.brechoId) {
+            const existingProduct = await Product.findOne({ where: { brechoId: productData.brechoId } });
+            if (existingProduct) return this.getProductById(existingProduct.id);
         }
 
-        const product = await Product.create(data);
+        const t = await sequelize.transaction();
 
-        if (productData.is_variable && attributes && attributes.length > 0) {
-            for (const attr of attributes) {
-                await ProductAttribute.create({
-                    productId: product.id,
-                    name: attr.name,
-                    options: attr.options
+        try {
+            // Handle Brand (Case-insensitive)
+            if (data.brand) {
+                // Try to find first
+                let brand = await Brand.findOne({
+                    where: sequelize.where(
+                        sequelize.fn('lower', sequelize.col('name')),
+                        sequelize.fn('lower', data.brand)
+                    ),
+                    transaction: t
                 });
+
+                if (!brand) {
+                    brand = await Brand.create({
+                        name: data.brand,
+                        slug: data.brand.toLowerCase().replace(/ /g, '-') + '-' + Date.now().toString().slice(-4), // Ensure unique slug
+                        active: true
+                    }, { transaction: t });
+                }
+                data.brandId = brand.id;
             }
-        }
 
-        if (productData.is_variable && variations && variations.length > 0) {
-            for (const variation of variations) {
-                await ProductVariation.create({
-                    productId: product.id,
-                    ...variation
-                });
+            // Create Product
+            // Ensure slug is unique if provided, or let it be null
+            if (productData.slug) {
+                // If slug is provided, check existence? Or just let it fail?
+                // Better to append random if needed, but for now let's assume input is clean or null
             }
-        }
 
-        // Integration with Brechó
-        if (process.env.INTEGRATION_ENABLED === 'true') {
-            const brechoProvider = require('../Integration/brecho.provider');
-            // Pass the full 'data' object which includes attributes and variations
-            const brechoProduct = await brechoProvider.createProductInBrecho(data);
+            const product = await Product.create(data, { transaction: t });
 
-            if (brechoProduct) {
-                await product.update({
-                    brechoId: brechoProduct.id,
-                    sku: brechoProduct.codigo_etiqueta // Ensure local SKU matches Brechó tag
-                });
+            if (productData.is_variable && attributes && attributes.length > 0) {
+                for (const attr of attributes) {
+                    await ProductAttribute.create({
+                        productId: product.id,
+                        name: attr.name,
+                        options: attr.options
+                    }, { transaction: t });
+                }
             }
-        }
 
-        return this.getProductById(product.id);
+            if (productData.is_variable && variations && variations.length > 0) {
+                for (const variation of variations) {
+                    await ProductVariation.create({
+                        productId: product.id,
+                        ...variation
+                    }, { transaction: t });
+                }
+            }
+
+            // Integration with Brechó (Recursive? No, this is receiving FROM Brecho usually, or local create)
+            // If this call came from SyncJob (which calls createProductInBrecho), we don't need to call back.
+            // But if it came from Admin Panel, we do.
+            // How to distinguish?
+            // The SyncJob calls `brechoProvider.createProductInBrecho` directly?
+            // No, SyncJob in API-ECOMMERCE calls `brechoProvider`.
+            // SyncJob in TIPTAG calls `API-ECOMMERCE` POST /products.
+            // So this IS the endpoint hit by Tiptag.
+            // We should NOT call `createProductInBrecho` if `brechoId` is already present (which means it came from Tiptag).
+
+            if (process.env.INTEGRATION_ENABLED === 'true' && !productData.brechoId) {
+                const brechoProvider = require('../Integration/brecho.provider');
+                // Pass the full 'data' object
+                const brechoProduct = await brechoProvider.createProductInBrecho(data);
+
+                if (brechoProduct) {
+                    await product.update({
+                        brechoId: brechoProduct.id,
+                        sku: brechoProduct.codigo_etiqueta
+                    }, { transaction: t });
+                }
+            }
+
+            await t.commit();
+            return this.getProductById(product.id);
+
+        } catch (error) {
+            await t.rollback();
+            // Check if it was a unique constraint error that slipped through
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                console.warn('[ProductService] Unique constraint error during create:', error.errors.map(e => e.message));
+                // Try to find the product again, maybe race condition
+                if (productData.sku) {
+                    const p = await Product.findOne({ where: { sku: productData.sku } });
+                    if (p) return this.getProductById(p.id);
+                }
+            }
+            throw error;
+        }
     }
 
     async getProducts(query) {
