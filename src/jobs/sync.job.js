@@ -6,16 +6,17 @@ const axios = require('axios');
 
 const syncJob = () => {
     // Run every minute
-    cron.schedule('* * * * *', async () => {
-        console.log('[SyncJob] Starting bidirectional sync...');
-
-        try {
-            await pushToBrecho();
-            await pullFromBrecho();
-        } catch (error) {
-            console.error('[SyncJob] Error in sync job:', error.message);
-        }
-    });
+    // cron.schedule('* * * * *', async () => {
+    //     console.log('[SyncJob] Starting bidirectional sync...');
+    // 
+    //     try {
+    //         await pushToBrecho();
+    //         await pullFromBrecho();
+    //     } catch (error) {
+    //         console.error('[SyncJob] Error in sync job:', error.message);
+    //     }
+    // });
+    console.log('[SyncJob] Scheduled sync disabled in favor of real-time sync.');
 };
 
 const pushToBrecho = async () => {
@@ -87,11 +88,14 @@ const pullFromBrecho = async () => {
 
         for (const peca of pecas) {
             // Check if we already have this product by brechoId OR sku
+            // Check if we already have this product by brechoId OR sku OR codigo_etiqueta
+            // We must be very careful to match ANY existing record to avoid duplication
             let product = await Product.findOne({
                 where: {
                     [Op.or]: [
                         { brechoId: peca.id },
-                        { sku: peca.sku_ecommerce || peca.codigo_etiqueta } // Fallback to label if no SKU
+                        { sku: peca.sku_ecommerce }, // Match by Ecommerce SKU if present
+                        { sku: peca.codigo_etiqueta } // Match by Tag Code if present (fallback)
                     ]
                 }
             });
@@ -114,7 +118,7 @@ const pullFromBrecho = async () => {
                 if (peca.categoria) {
                     const [category] = await Category.findOrCreate({
                         where: { name: peca.categoria.nome },
-                        defaults: { slug: peca.categoria.nome.toLowerCase().replace(/ /g, '-'), active: true }
+                        defaults: { slug: peca.categoria.nome.toLowerCase().replace(/ /g, '-'), isActive: true }
                     });
                     categoryId = category.id;
                 }
