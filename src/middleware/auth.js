@@ -4,8 +4,16 @@ const { User } = require('../models');
 const authMiddleware = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
+        const integrationSecret = req.headers['x-integration-secret'];
+
+        // Bypass for Integration
+        if (integrationSecret && integrationSecret === process.env.BRECHO_API_KEY) {
+            req.user = { id: 'integration-system', role: 'admin' }; // Grant admin access
+            return next();
+        }
+
         if (!authHeader) {
-            return res.status(401).json({ error: 'No token provided' });
+            return res.status(401).json({ error: 'Token not provided' });
         }
 
         const token = authHeader.split(' ')[1];

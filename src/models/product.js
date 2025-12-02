@@ -58,7 +58,14 @@ const Product = sequelize.define('Product', {
         unique: true,
     },
     brand: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING, // Legacy/Fallback
+    },
+    brandId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: 'Brands',
+            key: 'id',
+        },
     },
     tags: {
         type: DataTypes.JSONB, // ["electronics", "sale"]

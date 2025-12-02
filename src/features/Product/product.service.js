@@ -1,11 +1,20 @@
-const { Product, ProductAttribute, ProductVariation } = require('../../models');
+const { Product, ProductAttribute, ProductVariation, Category, Brand } = require('../../models');
 
 class ProductService {
     async createProduct(data) {
         // data: { name, description, price, sku, stock, is_variable, attributes: [{name, options}], variations: [...] }
         const { attributes, variations, ...productData } = data;
 
-        const product = await Product.create(productData);
+        // Handle Brand
+        if (data.brand) {
+            const [brand] = await Brand.findOrCreate({
+                where: { name: data.brand },
+                defaults: { slug: data.brand.toLowerCase().replace(/ /g, '-'), active: true }
+            });
+            data.brandId = brand.id;
+        }
+
+        const product = await Product.create(data);
 
         if (productData.is_variable && attributes && attributes.length > 0) {
             for (const attr of attributes) {

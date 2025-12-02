@@ -24,6 +24,7 @@ const Question = require('./question');
 const RelatedProduct = require('./relatedProduct');
 const TrackingEvent = require('./trackingEvent');
 const ShippingRule = require('./shippingRule');
+const Brand = require('./brand');
 
 // User & Role
 User.belongsTo(Role, { foreignKey: 'roleId' });
@@ -140,6 +141,10 @@ Product.belongsTo(Category, { foreignKey: 'categoryId' });
 Category.hasMany(Category, { as: 'subcategories', foreignKey: 'parentId' });
 Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' });
 
+// Brand Associations
+Brand.hasMany(Product, { foreignKey: 'brandId' });
+Product.belongsTo(Brand, { foreignKey: 'brandId' });
+
 module.exports = {
     sequelize,
     User,
@@ -164,6 +169,7 @@ module.exports = {
     RelatedProduct,
     TrackingEvent,
     Category,
+    Brand,
     ShippingRule,
     Sequelize,
     Op

@@ -61,6 +61,9 @@ class BrechoProvider {
             let marcaId = null;
             if (productData.brand) {
                 marcaId = await this.syncEntity('marcas', { nome: productData.brand }, { nome: productData.brand, ativa: true });
+            } else if (productData.brandId) {
+                // If we have ID but no name (unlikely given service logic, but possible), we might need to fetch name?
+                // But service passes 'data' which has 'brand' string.
             }
 
             // 3. Sync Attributes (Color/Size) - We need to pick ONE for the main product if it's a variable product parent,
@@ -137,7 +140,12 @@ class BrechoProvider {
                 categoriaId,
                 marcaId,
                 corId,
-                tamanhoId
+                tamanhoId,
+                // Dimensions
+                peso_kg: productData.weight || 0,
+                altura_cm: productData.dimensions?.height || 0,
+                largura_cm: productData.dimensions?.width || 0,
+                profundidade_cm: productData.dimensions?.length || 0
             };
 
             console.log('[BrechoProvider] Sending payload:', payload);

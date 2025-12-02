@@ -7,7 +7,12 @@ require('dotenv').config();
 const sequelize = require('./src/config/sequelize');
 const routes = require('./src/routes');
 
+const syncJob = require('./src/jobs/sync.job');
+
 const app = express();
+
+// Start Cron Jobs
+syncJob();
 
 // Middleware
 app.use(cors());
