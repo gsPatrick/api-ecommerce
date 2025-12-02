@@ -26,9 +26,10 @@ const pushToBrecho = async () => {
         // Let's focus on products that DON'T have brechoId first.
         const productsToSync = await Product.findAll({
             where: {
-                brechoId: null,
-                // Optional: createdAt > 5 minutes ago? To avoid race with immediate sync?
-                // Immediate sync happens in service. If it fails, this picks it up.
+                [Op.or]: [
+                    { brechoId: null }, // New products
+                    { updatedAt: { [Op.gt]: new Date(Date.now() - 5 * 60 * 1000) } } // Updated in last 5 mins
+                ]
             },
             include: [
                 { model: Category },
@@ -51,8 +52,14 @@ const pushToBrecho = async () => {
                 const brechoProduct = await brechoProvider.createProductInBrecho(productData);
 
                 if (brechoProduct && brechoProduct.id) {
-                    await product.update({ brechoId: brechoProduct.id });
-                    console.log(`[SyncJob] Synced product ${product.id} to Brechó ID ${brechoProduct.id}`);
+                    if (!product.brechoId) {
+                        await product.update({ brechoId: brechoProduct.id });
+                        console.log(`[SyncJob] Synced new product ${product.id} to Brechó ID ${brechoProduct.id}`);
+                    } else {
+                        // It was an update
+                        await brechoProvider.updateProductInBrecho(product.brechoId, productData);
+                        console.log(`[SyncJob] Synced update for product ${product.id} to Brechó.`);
+                    }
                 }
             }
         }

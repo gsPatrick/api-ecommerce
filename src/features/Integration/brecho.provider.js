@@ -168,6 +168,52 @@ class BrechoProvider {
         }
     }
 
+    async updateProductInBrecho(brechoId, productData) {
+        if (!this.enabled || !brechoId) return null;
+
+        console.log(`[BrechoProvider] Updating product ${brechoId} in Brechó...`);
+
+        try {
+            const payload = {
+                descricao_curta: productData.name,
+                descricao_detalhada: productData.description || productData.name,
+                preco_venda: productData.price,
+                sku_ecommerce: productData.sku,
+                peso_kg: productData.weight || 0,
+                altura_cm: productData.dimensions?.height || 0,
+                largura_cm: productData.dimensions?.width || 0,
+                profundidade_cm: productData.dimensions?.length || 0
+            };
+
+            const response = await axios.put(`${this.baseUrl}/catalogo/pecas/${brechoId}`, payload, {
+                headers: { 'x-integration-secret': this.apiKey }
+            });
+
+            console.log(`[BrechoProvider] Updated product ${brechoId} in Brechó.`);
+            return response.data;
+        } catch (error) {
+            console.error(`[BrechoProvider] Error updating product ${brechoId}:`, error.response?.data || error.message);
+            return null;
+        }
+    }
+
+    async deleteProductInBrecho(brechoId) {
+        if (!this.enabled || !brechoId) return null;
+
+        console.log(`[BrechoProvider] Deleting product ${brechoId} in Brechó...`);
+
+        try {
+            await axios.delete(`${this.baseUrl}/catalogo/pecas/${brechoId}`, {
+                headers: { 'x-integration-secret': this.apiKey }
+            });
+            console.log(`[BrechoProvider] Deleted product ${brechoId} in Brechó.`);
+            return true;
+        } catch (error) {
+            console.error(`[BrechoProvider] Error deleting product ${brechoId}:`, error.response?.data || error.message);
+            return false;
+        }
+    }
+
     async notifyOrder(orderData) {
         if (!this.enabled) return;
 

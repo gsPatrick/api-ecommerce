@@ -158,13 +158,30 @@ class ProductService {
     async updateProduct(id, data) {
         const product = await Product.findByPk(id);
         if (!product) throw new Error('Product not found');
-        return await product.update(data);
+        const updatedProduct = await product.update(data);
+
+        // Sync update to Brechó
+        if (process.env.INTEGRATION_ENABLED === 'true' && updatedProduct.brechoId) {
+            const brechoProvider = require('../Integration/brecho.provider');
+            await brechoProvider.updateProductInBrecho(updatedProduct.brechoId, updatedProduct.toJSON());
+        }
+
+        return updatedProduct;
     }
 
     async deleteProduct(id) {
         const product = await Product.findByPk(id);
         if (!product) throw new Error('Product not found');
-        return await product.destroy();
+        const brechoId = product.brechoId;
+        await product.destroy();
+
+        // Sync delete to Brechó
+        if (process.env.INTEGRATION_ENABLED === 'true' && brechoId) {
+            const brechoProvider = require('../Integration/brecho.provider');
+            await brechoProvider.deleteProductInBrecho(brechoId);
+        }
+
+        return true;
     }
 }
 
