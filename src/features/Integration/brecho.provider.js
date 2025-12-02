@@ -59,11 +59,15 @@ class BrechoProvider {
 
             // 2. Sync Brand (Marca)
             let marcaId = null;
-            if (productData.brand) {
-                marcaId = await this.syncEntity('marcas', { nome: productData.brand }, { nome: productData.brand, ativa: true });
-            } else if (productData.brandId) {
-                // If we have ID but no name (unlikely given service logic, but possible), we might need to fetch name?
-                // But service passes 'data' which has 'brand' string.
+            let brandName = productData.brand;
+
+            // Handle Brand object from Sequelize include
+            if (!brandName && productData.Brand && productData.Brand.name) {
+                brandName = productData.Brand.name;
+            }
+
+            if (brandName) {
+                marcaId = await this.syncEntity('marcas', { nome: brandName }, { nome: brandName, ativa: true });
             }
 
             // 3. Sync Attributes (Color/Size) - We need to pick ONE for the main product if it's a variable product parent,

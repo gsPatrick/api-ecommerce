@@ -100,7 +100,8 @@ async function seedData() {
         images: ['https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=800&auto=format&fit=crop'],
         is_variable: true,
         weight: 0.2,
-        dimensions: { height: 2, width: 20, length: 30 }
+        dimensions: { height: 2, width: 20, length: 30 },
+        status: 'published'
     });
 
     // Attributes for T-Shirt
@@ -127,7 +128,8 @@ async function seedData() {
         images: ['https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=800&auto=format&fit=crop'],
         is_variable: true,
         weight: 0.5,
-        dimensions: { height: 5, width: 30, length: 40 }
+        dimensions: { height: 5, width: 30, length: 40 },
+        status: 'published'
     });
 
     await ProductAttribute.create({ productId: hoodie.id, name: 'Size', options: ['M', 'G'] });
@@ -146,7 +148,8 @@ async function seedData() {
         images: ['https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop'],
         is_variable: true,
         weight: 0.1,
-        dimensions: { height: 10, width: 15, length: 20 }
+        dimensions: { height: 10, width: 15, length: 20 },
+        status: 'published'
     });
 
     await ProductAttribute.create({ productId: cap.id, name: 'Color', options: [{ name: 'Preto', hex: '#000000' }, { name: 'Rosa', hex: '#eb68b3' }] });
@@ -164,7 +167,8 @@ async function seedData() {
         is_variable: false,
         stock: 50,
         weight: 0.05,
-        dimensions: { height: 1, width: 5, length: 10 }
+        dimensions: { height: 1, width: 5, length: 10 },
+        status: 'published'
     });
 
     // 4. Products (Outlet)
@@ -178,7 +182,8 @@ async function seedData() {
         images: ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop'],
         is_variable: true,
         weight: 0.2,
-        dimensions: { height: 2, width: 20, length: 30 }
+        dimensions: { height: 2, width: 20, length: 30 },
+        status: 'published'
     });
 
     await ProductAttribute.create({ productId: oldTee.id, name: 'Size', options: ['P'] });
