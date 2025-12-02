@@ -29,7 +29,8 @@ class ProductService {
         // Integration with Brechó
         if (process.env.INTEGRATION_ENABLED === 'true') {
             const brechoProvider = require('../Integration/brecho.provider');
-            const brechoProduct = await brechoProvider.createProductInBrecho(productData);
+            // Pass the full 'data' object which includes attributes and variations
+            const brechoProduct = await brechoProvider.createProductInBrecho(data);
 
             if (brechoProduct) {
                 await product.update({
