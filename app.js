@@ -78,118 +78,21 @@ async function seedData() {
 
     console.log('👤 Admin users created with Super Admin role');
 
-    // 1. Categories
-    const catRoupas = await Category.create({ name: 'Roupas', slug: 'roupas', description: 'O melhor do streetwear.', isActive: true });
-    const catAcessorios = await Category.create({ name: 'Acessórios', slug: 'acessorios', description: 'Detalhes que fazem a diferença.', isActive: true });
-    const catOutlet = await Category.create({ name: 'Outlet', slug: 'outlet', description: 'Peças com descontos imperdíveis.', isActive: true });
+    // 1. Categories - REMOVED AS REQUESTED
+    // const catRoupas = await Category.create({ name: 'Roupas', slug: 'roupas', description: 'O melhor do streetwear.', isActive: true });
+    // const catAcessorios = await Category.create({ name: 'Acessórios', slug: 'acessorios', description: 'Detalhes que fazem a diferença.', isActive: true });
+    // const catOutlet = await Category.create({ name: 'Outlet', slug: 'outlet', description: 'Peças com descontos imperdíveis.', isActive: true });
 
-    // 1.1 Brands
-    const brandNike = await Brand.create({ name: 'Nike', slug: 'nike', active: true });
-    const brandAdidas = await Brand.create({ name: 'Adidas', slug: 'adidas', active: true });
-    const brandPuma = await Brand.create({ name: 'Puma', slug: 'puma', active: true });
-    const brandGeneric = await Brand.create({ name: 'Genérica', slug: 'generica', active: true });
+    // 1.1 Brands - REMOVED AS REQUESTED
+    // const brandNike = await Brand.create({ name: 'Nike', slug: 'nike', active: true });
+    // const brandAdidas = await Brand.create({ name: 'Adidas', slug: 'adidas', active: true });
+    // const brandPuma = await Brand.create({ name: 'Puma', slug: 'puma', active: true });
+    // const brandGeneric = await Brand.create({ name: 'Genérica', slug: 'generica', active: true });
 
-    // 2. Products (Roupas)
-    const tShirt = await Product.create({
-        name: 'T-Shirt Oversized Street',
-        description: 'Camiseta oversized com estampa exclusiva.',
-        price: 129.90,
-        categoryId: catRoupas.id,
-        category: 'Roupas', // Legacy
-        brandId: brandNike.id,
-        images: ['https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=800&auto=format&fit=crop'],
-        is_variable: true,
-        weight: 0.2,
-        dimensions: { height: 2, width: 20, length: 30 },
-        status: 'published'
-    });
+    // 2. Products - REMOVED AS REQUESTED
+    // ... Products creation code removed ...
 
-    // Attributes for T-Shirt
-    await ProductAttribute.create({ productId: tShirt.id, name: 'Size', options: ['P', 'M', 'G', 'GG'] });
-    await ProductAttribute.create({
-        productId: tShirt.id, name: 'Color', options: [
-            { name: 'Preto', hex: '#000000' },
-            { name: 'Branco', hex: '#FFFFFF' }
-        ]
-    });
-
-    // Variations for T-Shirt
-    await ProductVariation.create({ productId: tShirt.id, price: 129.90, stock: 10, attributes: { "Size": "M", "Color": "Preto" } });
-    await ProductVariation.create({ productId: tShirt.id, price: 129.90, stock: 5, attributes: { "Size": "G", "Color": "Branco" } });
-
-
-    const hoodie = await Product.create({
-        name: 'Hoodie Cyberpunk',
-        description: 'Moletom futurista com capuz.',
-        price: 299.90,
-        categoryId: catRoupas.id,
-        category: 'Roupas',
-        brandId: brandAdidas.id,
-        images: ['https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=800&auto=format&fit=crop'],
-        is_variable: true,
-        weight: 0.5,
-        dimensions: { height: 5, width: 30, length: 40 },
-        status: 'published'
-    });
-
-    await ProductAttribute.create({ productId: hoodie.id, name: 'Size', options: ['M', 'G'] });
-    await ProductAttribute.create({ productId: hoodie.id, name: 'Color', options: [{ name: 'Cinza', hex: '#797979' }] });
-    await ProductVariation.create({ productId: hoodie.id, price: 299.90, stock: 8, attributes: { "Size": "G", "Color": "Cinza" } });
-
-
-    // 3. Products (Acessórios)
-    const cap = await Product.create({
-        name: 'Boné Trucker Vibe',
-        description: 'Boné estilo trucker para completar o look.',
-        price: 89.90,
-        categoryId: catAcessorios.id,
-        category: 'Acessórios',
-        brandId: brandPuma.id,
-        images: ['https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop'],
-        is_variable: true,
-        weight: 0.1,
-        dimensions: { height: 10, width: 15, length: 20 },
-        status: 'published'
-    });
-
-    await ProductAttribute.create({ productId: cap.id, name: 'Color', options: [{ name: 'Preto', hex: '#000000' }, { name: 'Rosa', hex: '#eb68b3' }] });
-    await ProductVariation.create({ productId: cap.id, price: 89.90, stock: 15, attributes: { "Color": "Preto" } });
-    await ProductVariation.create({ productId: cap.id, price: 89.90, stock: 15, attributes: { "Color": "Rosa" } });
-
-    const chain = await Product.create({
-        name: 'Corrente Silver',
-        description: 'Corrente prateada grossa.',
-        price: 59.90,
-        categoryId: catAcessorios.id,
-        category: 'Acessórios',
-        brandId: brandGeneric.id,
-        images: ['https://images.unsplash.com/photo-1611085583191-a3b181a88401?q=80&w=800&auto=format&fit=crop'],
-        is_variable: false,
-        stock: 50,
-        weight: 0.05,
-        dimensions: { height: 1, width: 5, length: 10 },
-        status: 'published'
-    });
-
-    // 4. Products (Outlet)
-    const oldTee = await Product.create({
-        name: 'T-Shirt Last Season',
-        description: 'Últimas peças da coleção passada.',
-        price: 49.90,
-        categoryId: catOutlet.id,
-        category: 'Outlet',
-        brandId: brandNike.id,
-        images: ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop'],
-        is_variable: true,
-        weight: 0.2,
-        dimensions: { height: 2, width: 20, length: 30 },
-        status: 'published'
-    });
-
-    await ProductAttribute.create({ productId: oldTee.id, name: 'Size', options: ['P'] });
-    await ProductVariation.create({ productId: oldTee.id, price: 49.90, stock: 2, attributes: { "Size": "P" } });
-
-    console.log('✅ Data seeded successfully!');
+    console.log('✅ User/Role Data seeded successfully! (Products/Categories skipped)');
 }
 
 async function startServer() {
