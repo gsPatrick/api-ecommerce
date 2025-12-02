@@ -57,7 +57,9 @@ class ProductService {
         const where = {};
         const include = [
             { model: ProductAttribute, as: 'attributes' },
-            { model: ProductVariation, as: 'variations' }
+            { model: ProductVariation, as: 'variations' },
+            { model: Brand },
+            { model: Category }
         ];
 
         // Basic Filters
@@ -150,7 +152,9 @@ class ProductService {
         return await Product.findByPk(id, {
             include: [
                 { model: ProductAttribute, as: 'attributes' },
-                { model: ProductVariation, as: 'variations' }
+                { model: ProductVariation, as: 'variations' },
+                { model: Brand },
+                { model: Category }
             ]
         });
     }
