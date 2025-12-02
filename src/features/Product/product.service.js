@@ -14,6 +14,15 @@ class ProductService {
             data.brandId = brand.id;
         }
 
+        // Check if product with same SKU already exists
+        if (productData.sku) {
+            const existingProduct = await Product.findOne({ where: { sku: productData.sku } });
+            if (existingProduct) {
+                // Return existing product (Idempotency)
+                return this.getProductById(existingProduct.id);
+            }
+        }
+
         const product = await Product.create(data);
 
         if (productData.is_variable && attributes && attributes.length > 0) {
@@ -61,6 +70,10 @@ class ProductService {
             { model: Brand },
             { model: Category }
         ];
+
+        if (query.sku) {
+            where.sku = query.sku;
+        }
 
         // Basic Filters
         if (query.category) {
