@@ -33,7 +33,7 @@ app.use((err, req, res, next) => {
 // Porta obrigatória nos buildpacks/docker
 const PORT = process.env.PORT || 3000;
 
-const { Category, Product, ProductAttribute, ProductVariation, User } = require('./src/models');
+const { Category, Product, ProductAttribute, ProductVariation, User, Brand } = require('./src/models');
 
 async function seedData() {
     console.log('🌱 Seeding data...');
@@ -83,6 +83,12 @@ async function seedData() {
     const catAcessorios = await Category.create({ name: 'Acessórios', slug: 'acessorios', description: 'Detalhes que fazem a diferença.', isActive: true });
     const catOutlet = await Category.create({ name: 'Outlet', slug: 'outlet', description: 'Peças com descontos imperdíveis.', isActive: true });
 
+    // 1.1 Brands
+    const brandNike = await Brand.create({ name: 'Nike', slug: 'nike', active: true });
+    const brandAdidas = await Brand.create({ name: 'Adidas', slug: 'adidas', active: true });
+    const brandPuma = await Brand.create({ name: 'Puma', slug: 'puma', active: true });
+    const brandGeneric = await Brand.create({ name: 'Genérica', slug: 'generica', active: true });
+
     // 2. Products (Roupas)
     const tShirt = await Product.create({
         name: 'T-Shirt Oversized Street',
@@ -90,8 +96,11 @@ async function seedData() {
         price: 129.90,
         categoryId: catRoupas.id,
         category: 'Roupas', // Legacy
+        brandId: brandNike.id,
         images: ['https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=800&auto=format&fit=crop'],
-        is_variable: true
+        is_variable: true,
+        weight: 0.2,
+        dimensions: { height: 2, width: 20, length: 30 }
     });
 
     // Attributes for T-Shirt
@@ -114,8 +123,11 @@ async function seedData() {
         price: 299.90,
         categoryId: catRoupas.id,
         category: 'Roupas',
+        brandId: brandAdidas.id,
         images: ['https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=800&auto=format&fit=crop'],
-        is_variable: true
+        is_variable: true,
+        weight: 0.5,
+        dimensions: { height: 5, width: 30, length: 40 }
     });
 
     await ProductAttribute.create({ productId: hoodie.id, name: 'Size', options: ['M', 'G'] });
@@ -130,8 +142,11 @@ async function seedData() {
         price: 89.90,
         categoryId: catAcessorios.id,
         category: 'Acessórios',
+        brandId: brandPuma.id,
         images: ['https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop'],
-        is_variable: true
+        is_variable: true,
+        weight: 0.1,
+        dimensions: { height: 10, width: 15, length: 20 }
     });
 
     await ProductAttribute.create({ productId: cap.id, name: 'Color', options: [{ name: 'Preto', hex: '#000000' }, { name: 'Rosa', hex: '#eb68b3' }] });
@@ -144,9 +159,12 @@ async function seedData() {
         price: 59.90,
         categoryId: catAcessorios.id,
         category: 'Acessórios',
+        brandId: brandGeneric.id,
         images: ['https://images.unsplash.com/photo-1611085583191-a3b181a88401?q=80&w=800&auto=format&fit=crop'],
         is_variable: false,
-        stock: 50
+        stock: 50,
+        weight: 0.05,
+        dimensions: { height: 1, width: 5, length: 10 }
     });
 
     // 4. Products (Outlet)
@@ -156,8 +174,11 @@ async function seedData() {
         price: 49.90,
         categoryId: catOutlet.id,
         category: 'Outlet',
+        brandId: brandNike.id,
         images: ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop'],
-        is_variable: true
+        is_variable: true,
+        weight: 0.2,
+        dimensions: { height: 2, width: 20, length: 30 }
     });
 
     await ProductAttribute.create({ productId: oldTee.id, name: 'Size', options: ['P'] });
