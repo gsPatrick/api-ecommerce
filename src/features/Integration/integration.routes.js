@@ -26,13 +26,15 @@ router.post('/webhook/update-stock', async (req, res) => {
 
         // Map Brechó status to E-commerce status/stock logic
         // If status is 'VENDIDA', 'DEVOLVIDA_FORNECEDOR', etc., set stock to 0
-        const soldStatuses = ['VENDIDA', 'DEVOLVIDA_FORNECEDOR', 'BAIXADA'];
+        const soldStatuses = ['VENDIDA', 'DEVOLVIDA_FORNECEDOR', 'BAIXADA', 'RESERVADA_SACOLINHA'];
         if (soldStatuses.includes(status)) {
             updates.stock = 0;
             // Optionally update status to 'archived' or keep 'published' but out of stock
             // updates.status = 'archived'; 
-        } else if (status === 'DISPONIVEL') {
-            updates.stock = 1; // Assuming unique items
+        } else if (['DISPONIVEL', 'NOVO', 'NOVA', 'A_VENDA'].includes(status)) {
+            // Only set stock to 1 if it wasn't provided explicitly, or force it?
+            // If TipTag says DISPONIVEL/NOVO, usually stock is 1.
+            if (updates.stock === undefined) updates.stock = 1;
             updates.status = 'published';
         }
 

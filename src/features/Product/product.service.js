@@ -41,12 +41,8 @@ class ProductService {
             }
 
             // Create Product
-            // Ensure slug is unique if provided, or let it be null
-            if (productData.slug) {
-                // If slug is provided, check existence? Or just let it fail?
-                // Better to append random if needed, but for now let's assume input is clean or null
-            }
-
+            // Ensure images are saved directly (Array of objects { src: '...' })
+            // Ensure stock is set
             const product = await Product.create(data, { transaction: t });
 
             if (productData.is_variable && attributes && attributes.length > 0) {
@@ -223,6 +219,11 @@ class ProductService {
     async updateProduct(id, data) {
         const product = await Product.findByPk(id);
         if (!product) throw new Error('Product not found');
+
+        // Stock Logic: If stock is 0, we can optionally archive, but usually status comes from payload.
+        // If data.stock is 0, we ensure it's updated.
+        // Images Logic: Full replace is handled by sequelize update if data.images is provided.
+
         const updatedProduct = await product.update(data);
 
         // Sync update to Brechó
