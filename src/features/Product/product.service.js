@@ -33,11 +33,14 @@ class ProductService {
                 if (!brand) {
                     brand = await Brand.create({
                         name: data.brand,
-                        slug: data.brand.toLowerCase().replace(/ /g, '-') + '-' + Date.now().toString().slice(-4), // Ensure unique slug
-                        active: true
+                        slug: data.brand.toLowerCase().replace(/ /g, '-') + '-' + Date.now().toString().slice(-4),
+                        active: true,
+                        logo: data.brandImage || null // Set logo if provided
                     }, { transaction: t });
+                } else if (data.brandImage && brand.logo !== data.brandImage) {
+                    // Update logo if provided and different
+                    await brand.update({ logo: data.brandImage }, { transaction: t });
                 }
-                data.brandId = brand.id;
                 data.brandId = brand.id;
             }
 
@@ -138,6 +141,10 @@ class ProductService {
 
         if (query.sku) {
             where.sku = query.sku;
+        }
+
+        if (query.is_accessory) {
+            where.is_accessory = query.is_accessory === 'true';
         }
 
         // Basic Filters
@@ -255,6 +262,29 @@ class ProductService {
         const t = await sequelize.transaction();
 
         try {
+            // Handle Brand (Find by Name or Create)
+            if (productData.brand) {
+                let brand = await Brand.findOne({
+                    where: sequelize.where(
+                        sequelize.fn('lower', sequelize.col('name')),
+                        sequelize.fn('lower', productData.brand)
+                    ),
+                    transaction: t
+                });
+
+                if (!brand) {
+                    brand = await Brand.create({
+                        name: productData.brand,
+                        slug: productData.brand.toLowerCase().replace(/ /g, '-') + '-' + Date.now().toString().slice(-4),
+                        active: true,
+                        logo: productData.brandImage || null
+                    }, { transaction: t });
+                } else if (productData.brandImage && brand.logo !== productData.brandImage) {
+                    await brand.update({ logo: productData.brandImage }, { transaction: t });
+                }
+                productData.brandId = brand.id;
+            }
+
             // Handle Category (Find by Name or Create)
             if (productData.category) {
                 let category = await Category.findOne({

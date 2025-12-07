@@ -144,6 +144,10 @@ const Product = sequelize.define('Product', {
     supplier: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    is_accessory: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 });
 
