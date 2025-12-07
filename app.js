@@ -3,7 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
-
+const path = require('path');
 const sequelize = require('./src/config/sequelize');
 const routes = require('./src/routes');
 
@@ -20,6 +20,7 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api', routes);
@@ -101,7 +102,7 @@ async function startServer() {
         console.log('Database connected.');
 
         // ⚠️ FORCE TRUE ATIVADO A PEDIDO
-        await sequelize.sync({ force: true });
+        await sequelize.sync({ force: false });
         console.log('Models synced with FORCE: TRUE (Tables DROPPED & recreated).');
 
         await seedData();
