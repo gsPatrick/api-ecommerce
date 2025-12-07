@@ -52,48 +52,46 @@ async function seedData() {
         });
     });
 
-    const superAdminRole = await Role.create({
-        name: 'Super Admin',
-        description: 'Acesso total ao sistema',
-        permissions: superAdminPermissions
+    const [superAdminRole, createdRole] = await Role.findOrCreate({
+        where: { name: 'Super Admin' },
+        defaults: {
+            description: 'Acesso total ao sistema',
+            permissions: superAdminPermissions
+        }
     });
 
-    console.log('🛡️ Super Admin Role created');
+    if (createdRole) {
+        console.log('🛡️ Super Admin Role created');
+    } else {
+        console.log('🛡️ Super Admin Role already exists');
+    }
 
     // 0. Admin Users
-    await User.create({
-        name: 'Patrick Admin',
-        email: 'patrick@gmail.com',
-        password: 'patrick123',
-        role: 'admin',
-        roleId: superAdminRole.id
-    });
+    const admin1 = await User.findOne({ where: { email: 'patrick@gmail.com' } });
+    if (!admin1) {
+        await User.create({
+            name: 'Patrick Admin',
+            email: 'patrick@gmail.com',
+            password: 'patrick123',
+            role: 'admin',
+            roleId: superAdminRole.id
+        });
+        console.log('👤 Admin user Patrick created');
+    }
 
-    await User.create({
-        name: 'Admin Principal',
-        email: 'Nos.ecolaborativo@gmail.com',
-        password: 'Lorena13@',
-        role: 'admin',
-        roleId: superAdminRole.id
-    });
+    const admin2 = await User.findOne({ where: { email: 'Nos.ecolaborativo@gmail.com' } });
+    if (!admin2) {
+        await User.create({
+            name: 'Admin Principal',
+            email: 'Nos.ecolaborativo@gmail.com',
+            password: 'Lorena13@',
+            role: 'admin',
+            roleId: superAdminRole.id
+        });
+        console.log('👤 Admin user Principal created');
+    }
 
-    console.log('👤 Admin users created with Super Admin role');
-
-    // 1. Categories - REMOVED AS REQUESTED
-    // const catRoupas = await Category.create({ name: 'Roupas', slug: 'roupas', description: 'O melhor do streetwear.', isActive: true });
-    // const catAcessorios = await Category.create({ name: 'Acessórios', slug: 'acessorios', description: 'Detalhes que fazem a diferença.', isActive: true });
-    // const catOutlet = await Category.create({ name: 'Outlet', slug: 'outlet', description: 'Peças com descontos imperdíveis.', isActive: true });
-
-    // 1.1 Brands - REMOVED AS REQUESTED
-    // const brandNike = await Brand.create({ name: 'Nike', slug: 'nike', active: true });
-    // const brandAdidas = await Brand.create({ name: 'Adidas', slug: 'adidas', active: true });
-    // const brandPuma = await Brand.create({ name: 'Puma', slug: 'puma', active: true });
-    // const brandGeneric = await Brand.create({ name: 'Genérica', slug: 'generica', active: true });
-
-    // 2. Products - REMOVED AS REQUESTED
-    // ... Products creation code removed ...
-
-    console.log('✅ User/Role Data seeded successfully! (Products/Categories skipped)');
+    console.log('✅ Seeding check completed.');
 }
 
 async function startServer() {
