@@ -239,8 +239,17 @@ class ProductService {
 
     async updateProduct(id, data, options = {}) {
         const { sequelize } = require('../../models');
-        const product = await Product.findByPk(id);
-        if (!product) throw new Error('Product not found');
+
+        let product;
+        // Check if ID is numeric (ID) or string (SKU)
+        if (!isNaN(id)) {
+            product = await Product.findByPk(id);
+        } else {
+            // Try to find by SKU
+            product = await Product.findOne({ where: { sku: id } });
+        }
+
+        if (!product) throw new Error(`Product not found (ID/SKU: ${id})`);
 
         const { attributes, variations, ...productData } = data;
         const t = await sequelize.transaction();
