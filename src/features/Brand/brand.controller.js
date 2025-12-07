@@ -36,6 +36,40 @@ class BrandController {
             return res.status(500).json({ error: error.message });
         }
     }
+
+    async update(req, res) {
+        try {
+            const { id } = req.params;
+            const { name, logo, active } = req.body;
+
+            const brand = await Brand.findByPk(id);
+            if (!brand) return res.status(404).json({ error: 'Brand not found' });
+
+            await brand.update({
+                name: name || brand.name,
+                slug: name ? name.toLowerCase().replace(/ /g, '-') : brand.slug,
+                logo: logo !== undefined ? logo : brand.logo,
+                active: active !== undefined ? active : brand.active
+            });
+
+            return res.json(brand);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    }
+
+    async delete(req, res) {
+        try {
+            const { id } = req.params;
+            const brand = await Brand.findByPk(id);
+            if (!brand) return res.status(404).json({ error: 'Brand not found' });
+
+            await brand.destroy();
+            return res.status(204).send();
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    }
 }
 
 module.exports = new BrandController();
