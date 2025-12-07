@@ -101,9 +101,9 @@ async function startServer() {
         await sequelize.authenticate();
         console.log('Database connected.');
 
-        // ⚠️ FORCE TRUE ATIVADO A PEDIDO
-        await sequelize.sync({ force: false });
-        console.log('Models synced with FORCE: TRUE (Tables DROPPED & recreated).');
+        // ⚠️ FORCE TRUE DESATIVADO - USANDO MIGRATIONS
+        // await sequelize.sync({ force: false });
+        // console.log('Models synced (Managed by Migrations).');
 
         await seedData();
 
