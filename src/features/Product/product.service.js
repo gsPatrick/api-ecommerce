@@ -216,7 +216,7 @@ class ProductService {
         });
     }
 
-    async updateProduct(id, data) {
+    async updateProduct(id, data, options = {}) {
         const product = await Product.findByPk(id);
         if (!product) throw new Error('Product not found');
 
@@ -227,7 +227,7 @@ class ProductService {
         const updatedProduct = await product.update(data);
 
         // Sync update to Brechó
-        if (process.env.INTEGRATION_ENABLED === 'true' && updatedProduct.brechoId) {
+        if (process.env.INTEGRATION_ENABLED === 'true' && updatedProduct.brechoId && !options.fromSync) {
             const brechoProvider = require('../Integration/brecho.provider');
             await brechoProvider.updateProductInBrecho(updatedProduct.brechoId, updatedProduct.toJSON());
         }

@@ -40,7 +40,8 @@ class ProductController {
 
     async update(req, res) {
         try {
-            const product = await productService.updateProduct(req.params.id, req.body);
+            const fromSync = req.headers['x-from-sync'] === 'true';
+            const product = await productService.updateProduct(req.params.id, req.body, { fromSync });
             res.json(product);
         } catch (error) {
             res.status(400).json({ error: error.message });
