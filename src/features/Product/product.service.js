@@ -227,10 +227,19 @@ class ProductService {
         const updatedProduct = await product.update(data);
 
         // Sync update to Brechó
-        if (process.env.INTEGRATION_ENABLED === 'true' && updatedProduct.brechoId && !options.fromSync) {
-            const brechoProvider = require('../Integration/brecho.provider');
-            await brechoProvider.updateProductInBrecho(updatedProduct.brechoId, updatedProduct.toJSON());
+        // ⚠️ DISABLED to prevent infinite loop. Tiptag is the source of truth.
+        // If we enable this, we must ensure 'x-from-sync' header works perfectly.
+        /*
+        if (process.env.INTEGRATION_ENABLED === 'true' && updatedProduct.brechoId) {
+            if (options.fromSync) {
+                console.log('[ProductService] Skipping sync back to Brechó (fromSync=true)');
+            } else {
+                console.log('[ProductService] Syncing update back to Brechó...');
+                const brechoProvider = require('../Integration/brecho.provider');
+                await brechoProvider.updateProductInBrecho(updatedProduct.brechoId, updatedProduct.toJSON());
+            }
         }
+        */
 
         return updatedProduct;
     }

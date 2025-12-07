@@ -40,7 +40,9 @@ class ProductController {
 
     async update(req, res) {
         try {
+            console.log('[ProductController] Update request headers:', req.headers);
             const fromSync = req.headers['x-from-sync'] === 'true';
+            console.log('[ProductController] fromSync:', fromSync);
             const product = await productService.updateProduct(req.params.id, req.body, { fromSync });
             res.json(product);
         } catch (error) {
