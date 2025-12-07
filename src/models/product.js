@@ -140,6 +140,10 @@ const Product = sequelize.define('Product', {
     measurements: {
         type: DataTypes.JSONB, // Array of { name, value }
         defaultValue: []
+    },
+    supplier: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 });
 

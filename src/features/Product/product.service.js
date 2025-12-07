@@ -38,6 +38,27 @@ class ProductService {
                     }, { transaction: t });
                 }
                 data.brandId = brand.id;
+                data.brandId = brand.id;
+            }
+
+            // Handle Category (Find by Name or Create)
+            if (data.category) {
+                let category = await Category.findOne({
+                    where: sequelize.where(
+                        sequelize.fn('lower', sequelize.col('name')),
+                        sequelize.fn('lower', data.category)
+                    ),
+                    transaction: t
+                });
+
+                if (!category) {
+                    category = await Category.create({
+                        name: data.category,
+                        slug: data.category.toLowerCase().replace(/ /g, '-') + '-' + Date.now().toString().slice(-4),
+                        active: true
+                    }, { transaction: t });
+                }
+                data.categoryId = category.id;
             }
 
             // Create Product
@@ -225,6 +246,26 @@ class ProductService {
         const t = await sequelize.transaction();
 
         try {
+            // Handle Category (Find by Name or Create)
+            if (productData.category) {
+                let category = await Category.findOne({
+                    where: sequelize.where(
+                        sequelize.fn('lower', sequelize.col('name')),
+                        sequelize.fn('lower', productData.category)
+                    ),
+                    transaction: t
+                });
+
+                if (!category) {
+                    category = await Category.create({
+                        name: productData.category,
+                        slug: productData.category.toLowerCase().replace(/ /g, '-') + '-' + Date.now().toString().slice(-4),
+                        active: true
+                    }, { transaction: t });
+                }
+                productData.categoryId = category.id;
+            }
+
             // Update main product fields
             const updatedProduct = await product.update(productData, { transaction: t });
 
