@@ -136,6 +136,10 @@ const Product = sequelize.define('Product', {
         type: DataTypes.INTEGER,
         allowNull: true,
         unique: true
+    },
+    measurements: {
+        type: DataTypes.JSONB, // Array of { name, value }
+        defaultValue: []
     }
 });
 

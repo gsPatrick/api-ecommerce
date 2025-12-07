@@ -217,31 +217,66 @@ class ProductService {
     }
 
     async updateProduct(id, data, options = {}) {
+        const { sequelize } = require('../../models');
         const product = await Product.findByPk(id);
         if (!product) throw new Error('Product not found');
 
-        // Stock Logic: If stock is 0, we can optionally archive, but usually status comes from payload.
-        // If data.stock is 0, we ensure it's updated.
-        // Images Logic: Full replace is handled by sequelize update if data.images is provided.
+        const { attributes, variations, ...productData } = data;
+        const t = await sequelize.transaction();
 
-        const updatedProduct = await product.update(data);
+        try {
+            // Update main product fields
+            const updatedProduct = await product.update(productData, { transaction: t });
 
-        // Sync update to Brechó
-        // ⚠️ DISABLED to prevent infinite loop. Tiptag is the source of truth.
-        // If we enable this, we must ensure 'x-from-sync' header works perfectly.
-        /*
-        if (process.env.INTEGRATION_ENABLED === 'true' && updatedProduct.brechoId) {
-            if (options.fromSync) {
-                console.log('[ProductService] Skipping sync back to Brechó (fromSync=true)');
-            } else {
-                console.log('[ProductService] Syncing update back to Brechó...');
-                const brechoProvider = require('../Integration/brecho.provider');
-                await brechoProvider.updateProductInBrecho(updatedProduct.brechoId, updatedProduct.toJSON());
+            // Update Attributes (Full Replace)
+            if (attributes) {
+                await ProductAttribute.destroy({ where: { productId: id }, transaction: t });
+                if (attributes.length > 0) {
+                    for (const attr of attributes) {
+                        await ProductAttribute.create({
+                            productId: id,
+                            name: attr.name,
+                            options: attr.options
+                        }, { transaction: t });
+                    }
+                }
             }
-        }
-        */
 
-        return updatedProduct;
+            // Update Variations (Full Replace)
+            if (variations) {
+                await ProductVariation.destroy({ where: { productId: id }, transaction: t });
+                if (variations.length > 0) {
+                    for (const variation of variations) {
+                        await ProductVariation.create({
+                            productId: id,
+                            ...variation
+                        }, { transaction: t });
+                    }
+                }
+            }
+
+            await t.commit();
+
+            // Sync update to Brechó
+            // ⚠️ DISABLED to prevent infinite loop. Tiptag is the source of truth.
+            // If we enable this, we must ensure 'x-from-sync' header works perfectly.
+            /*
+            if (process.env.INTEGRATION_ENABLED === 'true' && updatedProduct.brechoId) {
+                if (options.fromSync) {
+                    console.log('[ProductService] Skipping sync back to Brechó (fromSync=true)');
+                } else {
+                    console.log('[ProductService] Syncing update back to Brechó...');
+                    const brechoProvider = require('../Integration/brecho.provider');
+                    await brechoProvider.updateProductInBrecho(updatedProduct.brechoId, updatedProduct.toJSON());
+                }
+            }
+            */
+
+            return this.getProductById(id); // Return full object with new relations
+        } catch (error) {
+            await t.rollback();
+            throw error;
+        }
     }
 
     async deleteProduct(id) {
