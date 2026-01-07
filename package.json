@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "npm run migrate && node app.js",
-    "dev": "npm run migrate && nodemon app.js",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "migrate": "npx sequelize-cli db:migrate",
     "build": "echo \"No build step required\""
   },

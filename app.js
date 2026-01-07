@@ -103,9 +103,9 @@ async function startServer() {
         // await sequelize.sync({ force: false });
         // console.log('Models synced (Managed by Migrations).');
 
-        // Temporary: Enable alter to ensure measurements column is added if migration failed
-        await sequelize.sync({ alter: true });
-        console.log('Models synced (Alter: true).');
+        // User requested force: true to reset schema
+        await sequelize.sync({ force: true });
+        console.log('Models synced (Force: true).');
 
         await seedData();
 
