@@ -79,16 +79,16 @@ async function seedData() {
         console.log('👤 Admin user Patrick created');
     }
 
-    const admin2 = await User.findOne({ where: { email: 'Nos.ecolaborativo@gmail.com' } });
+    const admin2 = await User.findOne({ where: { email: 'admin@alcateia.com' } });
     if (!admin2) {
         await User.create({
-            name: 'Admin Principal',
-            email: 'Nos.ecolaborativo@gmail.com',
-            password: 'Lorena13@',
+            name: 'Alcateia Admin',
+            email: 'admin@alcateia.com',
+            password: 'alcateiaadmin123',
             role: 'admin',
             roleId: superAdminRole.id
         });
-        console.log('👤 Admin user Principal created');
+        console.log('👤 Admin user Alcateia created');
     }
 
     console.log('✅ Seeding check completed.');
